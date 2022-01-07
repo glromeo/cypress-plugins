@@ -3,7 +3,15 @@ git:
 language: node_js
 node_js:
   - '16'
-cache: yarn
+cache:
+  yarn: true
+  directories:
+    - node_modules
+    - ~/.npm
+    - ~/.cache
+  override:
+    - yarn install --immutable --immutable-cache --check-cache
+    - yarn verify
 install:
   - yarn install
 script:
