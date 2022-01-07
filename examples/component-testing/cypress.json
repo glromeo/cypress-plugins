@@ -1,0 +1,14 @@
+{
+  "baseUrl": "http://localhost:3000/",
+  "watchForFileChanges": false,
+  "video": false,
+  "nodeVersion": "bundled",
+  "execTimeout": 6000000,
+  "taskTimeout": 6000000,
+  "component": {
+    "componentFolder": "src",
+    "testFiles": "**/*.spec.js",
+    "viewportHeight": 500,
+    "viewportWidth": 700
+  }
+}

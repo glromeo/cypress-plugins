@@ -1,0 +1,42 @@
+{
+  "name": "cucumber-example",
+  "version": "1.0.0",
+  "description": "Example cypress project to show how to wite cucumber e2e tests with esbuild",
+  "scripts": {
+    "build": "node ./build.js",
+    "start": "serve --no-clipboard",
+    "test": "cross-env ELECTRON_EXTRA_LAUNCH_ARGS=--remote-debugging-port=8315 cypress run",
+    "ci": "server-test http://localhost:3000",
+    "open": "cross-env ELECTRON_EXTRA_LAUNCH_ARGS=--remote-debugging-port=8315 cypress open"
+  },
+  "keywords": [
+    "cypress",
+    "esbuild",
+    "cucumber",
+    "test"
+  ],
+  "author": "Gianluca Romeo <glromeo@gmail.com>",
+  "license": "MIT",
+  "devDependencies": {
+    "@types/react": "^17.0.37",
+    "@types/react-dom": "^17.0.11",
+    "cross-env": "^7.0.3",
+    "cypress": "^9.1.1",
+    "cypress-cucumber-plugin": "^1.0.0",
+    "esbuild": "^0.14.2",
+    "esbuild-sass-plugin": "^2.0.1",
+    "serve": "^13.0.2",
+    "start-server-and-test": "^1.14.0",
+    "typescript": "^4.5.2"
+  },
+  "dependencies": {
+    "@emotion/react": "^11.7.0",
+    "@emotion/styled": "^11.6.0",
+    "@mui/material": "^5.2.2",
+    "react": "^17.0.2",
+    "react-dom": "^17.0.2"
+  },
+  "cypress-cucumber-preprocessor": {
+    "nonGlobalStepDefinitions": true
+  }
+}

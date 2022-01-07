@@ -1,0 +1,25 @@
+{
+  "name": "cypress-plugins",
+  "version": "1.0.0",
+  "repository": "git@github.com:glromeo/cypress-plugins.git",
+  "author": "Gianluca Romeo <glromeo@gmail.com>",
+  "license": "MIT",
+  "private": true,
+  "workspaces": [
+    "coverage-plugin",
+    "cucumber-plugin",
+    "cypress-runner",
+    "esbuild-dev-server",
+    "examples/component-testing",
+    "examples/cucumber",
+    "examples/native-coverage"
+  ],
+  "devDependencies": {
+    "lerna": "^4.0.0"
+  },
+  "scripts": {
+    "link": "lerna run link",
+    "build": "lerna run build",
+    "watch": "lerna run watch --parallel"
+  }
+}
