@@ -13,9 +13,10 @@
     "todomvc-app-css": "^2.3.0"
   },
   "scripts": {
-    "start": "serve --no-clipboard",
+    "build": "echo 'nothing to build here'",
+    "start": "serve -p 3300 --no-clipboard",
     "test": "cross-env ELECTRON_EXTRA_LAUNCH_ARGS=--remote-debugging-port=8315 cypress run",
-    "ci": "server-test http://localhost:3000",
+    "ci": "server-test http://localhost:3300",
     "open": "cross-env ELECTRON_EXTRA_LAUNCH_ARGS=--remote-debugging-port=8315 cypress open"
   },
   "devDependencies": {

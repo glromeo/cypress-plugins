@@ -4,9 +4,9 @@
   "description": "Example cypress project to show how to wite cucumber e2e tests with esbuild",
   "scripts": {
     "build": "node ./build.js",
-    "start": "serve --no-clipboard",
+    "start": "serve -p 3200 --no-clipboard",
     "test": "cross-env ELECTRON_EXTRA_LAUNCH_ARGS=--remote-debugging-port=8315 cypress run",
-    "ci": "server-test http://localhost:3000",
+    "ci": "server-test http://localhost:3200",
     "open": "cross-env ELECTRON_EXTRA_LAUNCH_ARGS=--remote-debugging-port=8315 cypress open"
   },
   "keywords": [

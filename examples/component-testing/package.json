@@ -14,9 +14,9 @@
   },
   "scripts": {
     "build": "node ./build.js",
-    "start": "serve --no-clipboard",
+    "start": "serve -p 3100 --no-clipboard",
     "test": "cross-env ELECTRON_EXTRA_LAUNCH_ARGS=--remote-debugging-port=8315 cypress run-ct",
-    "ci": "server-test http://localhost:3000",
+    "ci": "server-test http://localhost:3100",
     "open": "cross-env ELECTRON_EXTRA_LAUNCH_ARGS=--remote-debugging-port=8315 cypress open-ct"
   },
   "devDependencies": {
