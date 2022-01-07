@@ -7,5 +7,5 @@ cache: yarn
 install:
   - yarn install
 script:
-  - yarn lerna build
-  - yarn lerna ci
+  - yarn lerna run build
+  - yarn lerna run ci
