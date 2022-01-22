@@ -19,7 +19,11 @@ const {cucumberPlugin} = require("cypress-cucumber-plugin");
  * @type {Cypress.PluginConfig}
  */
 module.exports = (on, config) => {
-    nativeCoveragePlugin(on, config);
+    nativeCoveragePlugin(on, config, {
+        basedir: "public",
+        include: "/lib/**/*.js",
+        reports: ["html"]
+    });
     cucumberPlugin(on, config, {
     });
 };

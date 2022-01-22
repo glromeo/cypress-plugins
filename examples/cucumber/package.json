@@ -24,7 +24,7 @@
     "cypress": "^9.1.1",
     "cypress-cucumber-plugin": "^1.0.0",
     "esbuild": "^0.14.2",
-    "esbuild-sass-plugin": "^2.0.1",
+    "esbuild-sass-plugin": "^2.0.0",
     "serve": "^13.0.2",
     "start-server-and-test": "^1.14.0",
     "typescript": "^4.5.2"

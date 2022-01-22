@@ -5,6 +5,10 @@ import Button from "@mui/material/Button";
 import {TextField} from "@mui/material";
 import {add} from "./add";
 
+function definitelyNotCovered() {
+    console.log("nay!")
+}
+
 export default function App() {
     const [left, setLeft] = useState<number | null>(null);
     const [right, setRight] = useState<number | null>(null);

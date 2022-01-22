@@ -12,3 +12,7 @@
 // You can read more here:
 // https://on.cypress.io/configuration
 // ***********************************************************
+
+import './commands.js'
+
+import 'cypress-native-coverage/support'

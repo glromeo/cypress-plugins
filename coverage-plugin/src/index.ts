@@ -1,7 +1,7 @@
 /// <reference types="cypress" />
 import CDP from 'chrome-remote-interface'
 import path from 'path'
-import fs, {mkdirSync} from 'fs'
+import fs, {existsSync, mkdirSync} from 'fs'
 import v8ToIstanbul from 'v8-to-istanbul'
 import libCoverage, {CoverageMap} from 'istanbul-lib-coverage'
 import libReport from 'istanbul-lib-report'
@@ -18,6 +18,7 @@ const debug = require('debug')('cypress-native-coverage')
 
 export function nativeCoveragePlugin(on: PluginEvents, config: PluginConfigOptions, options: Partial<{
   basedir: string
+  prefix: string,
   include: Glob
   exclude: Glob
   port: number
@@ -32,6 +33,7 @@ export function nativeCoveragePlugin(on: PluginEvents, config: PluginConfigOptio
 
   const {
     basedir = 'build',
+    prefix,
     include = '/**/*.js',
     exclude,
     reports = [],
@@ -41,7 +43,12 @@ export function nativeCoveragePlugin(on: PluginEvents, config: PluginConfigOptio
 
   debug(`basedir: ${basedir}`)
 
-  const OUTDIR = path.resolve(projectRoot, basedir)
+  const outdir = path.resolve(projectRoot, basedir)
+  if (!existsSync(outdir)) {
+    console.error('unable to find basedir:', outdir)
+    process.exit(-1)
+  }
+
   const NYC_OUTPUT = path.resolve(projectRoot, '.nyc_output')
   const NYC_OUTFILE = path.join(NYC_OUTPUT, `out.json`)
 
@@ -74,23 +81,6 @@ export function nativeCoveragePlugin(on: PluginEvents, config: PluginConfigOptio
       }
       return
     }
-
-    coverageMap = libCoverage.createCoverageMap()
-    if (merge) merged = readFile(NYC_OUTFILE, 'utf8').then(text => {
-      const data = JSON.parse(text)
-      coverageMap.merge(data)
-      debug('merged existing coverage map')
-    }).catch(() => {
-      console.error('unable to merge', NYC_OUTFILE)
-    })
-
-    await cdp.Profiler.enable()
-    await cdp.Profiler.startPreciseCoverage({
-      detailed: true,
-      callCount: true,
-      allowTriggeredUpdates: true
-    })
-    debug('started precise coverage')
   }
 
   const includes = include && picomatch(include)
@@ -107,16 +97,28 @@ export function nativeCoveragePlugin(on: PluginEvents, config: PluginConfigOptio
 
     for (const {url, functions} of coverage.result) {
       if (url) try {
-        const {pathname} = new URL(url)
+        let {pathname} = new URL(url)
+        if (prefix) {
+          if (pathname.startsWith(prefix)) {
+            pathname = pathname.slice(prefix.length)
+          } else {
+            continue;
+          }
+        }
         if (isMatch(pathname)) {
           debug('matched', pathname)
+          const basedir = path.join(outdir, path.dirname(pathname))
           const converter = v8ToIstanbul(
-            path.join(OUTDIR, pathname),
+            path.join(outdir, pathname),
             0,
             undefined,
             excludePath || (pathname => {
+              if (/\.\.?\//.test(pathname)) {
+                pathname = path.join(basedir, pathname)
+              }
               const relative = path.relative(projectRoot, pathname).replace(/\\/g, '/')
-              return !relative.startsWith(basedir)
+              const accept = relative.startsWith('src')
+              return !accept || relative.endsWith('.scss')
             })
           )
           await converter.load()
@@ -124,7 +126,8 @@ export function nativeCoveragePlugin(on: PluginEvents, config: PluginConfigOptio
           coverageMap.merge(converter.toIstanbul())
         }
       } catch (error: any) {
-        debug(`failed to collect coverage result for: ${url}`, error.message)
+        console.error(`failed to collect coverage result for: ${url}`, error.message)
+        process.exit(-1)
       }
     }
   }
@@ -135,6 +138,9 @@ export function nativeCoveragePlugin(on: PluginEvents, config: PluginConfigOptio
   }
 
   async function writeCoverageMap() {
+    if (coverageMap.getCoverageSummary().isEmpty()) {
+      console.warn('coverage summary is empty')
+    }
     await writeFile(NYC_OUTFILE, JSON.stringify(coverageMap.toJSON()))
   }
 
@@ -187,11 +193,39 @@ export function nativeCoveragePlugin(on: PluginEvents, config: PluginConfigOptio
     return launchOptions
   })
 
-  on('after:spec', async (spec: Cypress.Spec) => {
-    if (cdp) {
-      await merged
-      await takeCoverage()
-      await stopCoverage()
+  on('before:run', async () => {
+    coverageMap = libCoverage.createCoverageMap()
+    if (merge) merged = readFile(NYC_OUTFILE, 'utf8').then(text => {
+      const data = JSON.parse(text)
+      coverageMap.merge(data)
+      debug('merged existing coverage map')
+    }).catch(() => {
+      console.error('unable to merge', NYC_OUTFILE)
+    })
+  })
+
+  on('task', {
+
+    async ['coverage:before']() {
+      if (cdp) {
+        await cdp.Profiler.enable()
+        await cdp.Profiler.startPreciseCoverage({
+          detailed: true,
+          callCount: true,
+          allowTriggeredUpdates: true
+        })
+        debug('started precise coverage')
+      }
+      return null
+    },
+
+    async ['coverage:after']() {
+      if (cdp) {
+        await merged
+        await takeCoverage()
+        await stopCoverage()
+      }
+      return null
     }
   })
 
